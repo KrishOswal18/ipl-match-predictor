@@ -2,6 +2,24 @@ import streamlit as st
 import pandas as pd
 import pickle
 
+df = pd.read_csv("deliveries.csv")
+match_scores = df.groupby(['match_id', 'inning', 'batting_team'])['total_runs'].sum().reset_index()
+inn1 = match_scores[match_scores['inning'] == 1][['match_id', 'batting_team', 'total_runs']]
+inn2 = match_scores[match_scores['inning'] == 2][['match_id', 'batting_team', 'total_runs']]
+inn1.columns = ['match_id', 'team1', 'score1']
+inn2.columns = ['match_id', 'team2', 'score2']
+matches = pd.merge(inn1, inn2, on='match_id')
+matches['winner'] = matches.apply(
+    lambda r: r['team2'] if r['score2'] > r['score1'] else r['team1'], axis=1)
+
+
+def head_to_head(team1, team2, matches):
+    h2h = matches[(matches['team1']==team1) & (matches['team2']==team2)]
+    win_count_t1 = len(h2h[h2h['winner']==team1])
+    win_count_t2 = len(h2h[h2h['winner']!=team1])
+
+    return win_count_t1, win_count_t2
+
 # ── Load model and encoder ───────────────────────────────────
 with open('model.pkl', 'rb') as f:
     model = pickle.load(f)
@@ -80,6 +98,20 @@ if st.button("🔮 Predict Winner", use_container_width=True):
 
     except Exception as e:
         st.error(f"Error: {e}. Make sure both teams are different.")
+
+st.markdown("---")
+st.markdown("## 🤝 Head to Head Stats")
+
+t1_wins, t2_wins = head_to_head(team1, team2, matches)
+total = t1_wins + t2_wins
+
+if total == 0:
+    st.info("No head to head data found for this combination.")
+else:
+    st.markdown(f"**Total matches (team1 batting first):** {total}")
+    col7, col8 = st.columns(2)
+    col7.metric(f"{team1} wins", t1_wins)
+    col8.metric(f"{team2} wins", t2_wins)
 
 st.markdown("---")
 st.caption("Built by [Your Name] | Model: Random Forest | Data: Kaggle IPL Dataset")

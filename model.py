@@ -74,4 +74,16 @@ with open('model.pkl', 'wb') as f:
 with open('encoder.pkl', 'wb') as f:
     pickle.dump(le, f)
 
+def head_to_head(team1, team2, matches):
+    h2h = matches[(matches['team1']==team1) & (matches['team2']==team2)]
+    win_count_t1 = len(h2h[h2h['winner']==team1])
+    win_count_t2 = len(h2h[h2h['winner']!=team1])
+
+    return win_count_t1, win_count_t2
+
+t1_wins, t2_wins = head_to_head('Chennai Super Kings', 'Mumbai Indians', matches)
+print(f"Csk wins {t1_wins} and MI wins {t2_wins}")
+
+    
+
 print("\nModel saved!")
