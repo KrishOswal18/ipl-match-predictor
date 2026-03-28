@@ -138,5 +138,33 @@ fig.update_layout(template='plotly_dark', showlegend=False)
 st.plotly_chart(fig, use_container_width=True)
 
 st.markdown("---")
+st.markdown("## 🏏 All Time Top 5 Most Economical Bowlers")
+
+balls = df.groupby('bowler')['over'].count()
+overs = balls / 6
+runs = df.groupby('bowler')['total_runs'].sum()
+economy = runs / overs
+
+# Only keep bowlers with 20+ overs
+economy = economy[balls >= 120]
+
+economy = economy.sort_values().head(5).reset_index()
+economy.columns = ['Bowler', 'Economy']
+economy['Economy'] = economy['Economy'].round(2)
+
+fig = px.bar(
+    economy,
+    x='Bowler',
+    y='Economy',
+    title='Top 5 IPL Most Economical Bowlers',
+    color='Economy',
+    color_continuous_scale='Blues',
+    text='Economy'
+)
+fig.update_traces(textposition='outside')
+fig.update_layout(template='plotly_dark', showlegend=False)
+st.plotly_chart(fig, use_container_width=True)
+
+st.markdown("---")
 st.caption("Built by Krish Oswal | Model: Random Forest | Data: Kaggle IPL Dataset")
 
