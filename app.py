@@ -114,4 +114,29 @@ else:
     col8.metric(f"{team2} wins", t2_wins)
 
 st.markdown("---")
-st.caption("Built by [Your Name] | Model: Random Forest | Data: Kaggle IPL Dataset")
+st.markdown("## 🏏 All Time Top 5 Run Scorers")
+
+top_scorers = df.groupby('batter')['batsman_runs'].sum().sort_values(ascending=False).head(5).reset_index()
+top_scorers.columns = ['Batter', 'Total Runs']
+
+top_scorers = top_scorers.reset_index(drop=True)
+top_scorers.index = top_scorers.index + 1
+
+import plotly.express as px
+
+fig = px.bar(
+    top_scorers,
+    x='Batter',
+    y='Total Runs',
+    title='Top 5 IPL Run Scorers of All Time',
+    color='Total Runs',
+    color_continuous_scale='Blues',
+    text='Total Runs'
+)
+fig.update_traces(textposition='outside')
+fig.update_layout(template='plotly_dark', showlegend=False)
+st.plotly_chart(fig, use_container_width=True)
+
+st.markdown("---")
+st.caption("Built by Krish Oswal | Model: Random Forest | Data: Kaggle IPL Dataset")
+
