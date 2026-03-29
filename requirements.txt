@@ -1,4 +1,3 @@
-Requirements:
 pandas
 scikit-learn
 xgboost
