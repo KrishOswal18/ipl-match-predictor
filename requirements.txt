@@ -1,0 +1,8 @@
+Requirements:
+pandas
+scikit-learn
+xgboost
+streamlit
+yfinance
+plotly
+openpyxl
